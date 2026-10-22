@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Commerce Customer Review Sentiment Analysis - Presentation</title>
+    <style>
+        :root {
+            --primary: #0D47A1;
+            --secondary: #1565C0;
+            --accent: #00BCD4;
+            --bg-dark: #0A192F;
+            --card-bg: #FFFFFF;
+            --text-main: #1E293B;
+            --text-muted: #64748B;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .presentation-container {
+            width: 1150px;
+            height: 650px;
+            position: relative;
+            perspective: 1000px;
+        }
+
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
+            padding: 35px 50px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            opacity: 0;
+            transform: scale(0.95) translateY(20px);
+            pointer-events: none;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .slide.active {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+            pointer-events: auto;
+            z-index: 10;
+        }
+
+        .slide::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 8px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            border-radius: 12px 12px 0 0;
+        }
+
+        .slide-header {
+            margin-bottom: 2px;
+        }
+
+        h1 {
+            color: var(--primary);
+            font-size: 24px;
+            margin: 0 0 2px 0;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            color: var(--accent);
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+        }
+
+        .slide-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            margin: 10px 0;
+        }
+
+        ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        li {
+            font-size: 15px;
+            line-height: 1.4;
+            color: var(--text-main);
+            margin-bottom: 6px;
+        }
+
+        li strong {
+            color: var(--primary);
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1.1fr;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .screenshot-container {
+            text-align: center;
+            background: #F1F5F9;
+            border: 2px solid #E2E8F0;
+            border-radius: 8px;
+            padding: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            max-height: 380px;
+        }
+
+        .screenshot-container img {
+            max-width: 100%;
+            max-height: 330px;
+            border-radius: 4px;
+            object-fit: contain;
+        }
+
+        .caption {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 6px;
+            font-weight: 600;
+        }
+
+        .slide-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid #E2E8F0;
+            padding-top: 8px;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .badge {
+            background: #E0F2FE;
+            color: var(--primary);
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 11px;
+        }
+
+        .title-slide {
+            background: linear-gradient(135deg, #0A192F, #1E3A8A);
+            color: white;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .title-slide h1 {
+            color: white;
+            font-size: 51px;
+            margin-bottom: 15px;
+        }
+
+        .title-slide .subtitle {
+            font-size: 16px;
+        }
+
+        .title-slide p {
+            color: #94A3B8;
+            font-size: 22px;
+            margin: 6px 0;
+        }
+
+        .title-slide .small-meta {
+            font-size: 18px !important;
+            color: #CBD5E1;
+            margin-top: 20px;
+        }
+
+        .flow-container {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            background: #F8FAFC;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #E2E8F0;
+        }
+
+        .flow-box {
+            background: white;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 13px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .flow-arrow {
+            text-align: center;
+            color: var(--accent);
+            font-weight: bold;
+            font-size: 15px;
+            margin: -2px 0;
+        }
+
+        .chart-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            background: #F8FAFC;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #E2E8F0;
+        }
+
+        .chart-bar-wrap {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .chart-label {
+            width: 110px;
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--text-main);
+        }
+
+        .chart-bar-bg {
+            flex-grow: 1;
+            background: #E2E8F0;
+            border-radius: 6px;
+            height: 20px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .chart-bar-fill {
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            height: 100%;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 8px;
+            color: white;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .nav-controls {
+            position: fixed;
+            bottom: 20px;
+            right: 30px;
+            display: flex;
+            gap: 10px;
+            z-index: 1000;
+        }
+
+        .nav-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            backdrop-filter: blur(5px);
+            transition: all 0.2s;
+        }
+
+        .nav-btn:hover {
+            background: var(--accent);
+            color: var(--bg-dark);
+            border-color: var(--accent);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="presentation-container">
+
+        <!-- Slide 1: Title Slide -->
+        <div class="slide title-slide active">
+            <div class="subtitle" style="color: var(--accent);">AI & Machine Learning Internship Project</div>
+            <h1>E-Commerce Customer Review Sentiment Analysis</h1>
+            <p style="font-weight: 600; color: #fff;">Submitted By: Kavya (Roll No.: 24049425, BCA Sem V)</p>
+            <p>Khalsa College for Women, Civil Lines, Ludhiana</p>
+            <p class="small-meta">Industry Mentor: Mr. Aksh Malhotra (Astirmind Software Solutions) | Faculty Supervisor: Ms. Inderpreet Kaur</p>
+            <div class="slide-footer" style="border-top: 1px solid rgba(255,255,255,0.1); color: #94A3B8; position: absolute; bottom: 15px; left: 50px; right: 50px;">
+                <span>Panjab University, Chandigarh</span>
+                <span>Slide 1 / 20</span>
+            </div>
+        </div>
+
+        <!-- Slide 2: Introduction -->
+        <div class="slide">
+            <div class="slide-header">
+                <div class="subtitle">Chapter 1: Introduction</div>
+                <h1>Project Overview & Context</h1>
+            </div>
+            <div class="slide-content grid-2">
+                <ul>
+                    <li><strong>The E-Commerce Boom:</strong> Online shopping platforms handle thousands of customer reviews daily, containing vital satisfaction insights.</li>
+                    <li><strong>The Bottleneck:</strong> Manual evaluation of massive review streams is slow, inefficient, and prone to human oversight.</li>
+                    <li><strong>Sentiment Analysis:</strong> An advanced NLP technique using AI and ML to categorize customer opinions automatically.</li>
+                </ul>
+                <div class="flow-container">
+                    <div class="flow-box">Raw E-Commerce Feedback</div>
+                    <div class="flow-arrow">&darr;</div>
+                    <div class="flow-box">AI Sentiment Classifier</div>
+                    <div class="flow-arrow">&darr;</div>
+                    <div class="flow-box">Positive / Neutral / Negative</div>
+                </div>
+            </div>
+            <div class="slide-footer">
+                <span>E-Commerce Sentiment Analyzer</span>
+                <span class="badge">Slide 2</span>
+            </div>
+        </div>
+
+        <!-- Slide 3: Problem Statement -->
+        <div class="slide">
+            <div class="slide-header">
+                <div class="subtitle">Problem Definition</div>
+                <h1>The Challenge of Scale & Context</h1>
+            </div>
+            <div class="slide-content grid-2">
+                <ul>
+                    <li><strong>Manual Limitations:</strong> Traditional rule-based and keyword-matching systems fail to decode complex sentence structures.</li>
+                    <li><strong>Delayed Decisions:</strong> Heavy manual workloads prevent organizations from rapidly reacting to feedback.</li>
+                    <li><strong>Core Objective:</strong> Build an automated multi-class classification system.</li>
+                </ul>
+                <div class="chart-container">
+                    <div style="font-weight: 700; color: var(--primary); margin-bottom: 5px;">Analysis Bottlenecks</div>
+                    <div class="chart-bar-wrap"><div class="chart-label">Manual Speed</div><div class="chart-bar-bg"><div class="chart-bar-fill" style="width: 25%; background: #C62828;">Slow</div></div></div>
+                    <div class="chart-bar-wrap"><div class="chart-label">Context Accuracy</div><div class="chart-bar-bg"><div class="chart-bar-fill" style="width: 40%; background: #D97706;">Low</div></div></div>
+                    <div class="chart-bar-wrap"><div class="chart-label">AI Automation</div><div class="chart-bar-bg"><div class="chart-bar-fill" style="width: 95%; background: #2E7D32;">Optimal</div></div></div>
+                </div>
+            </div>
+            <div class="slide-footer">
+                <span>E-Commerce Sentiment Analyzer</span>
+                <span class="badge">Slide 3</span>
+            </div>
+        </div>
+
+        <!-- Slide 4: Objectives -->
+        <div class="slide">
+            <div class="slide-header">
+                <div class="subtitle">Project Goals</div>
+                <h1>Key System Objectives</h1>
+            </div>
+            <div class="slide-content grid-2">
+                <ul>
+                    <li>Develop an AI/ML-driven desktop software for automated review classification.</li>
+                    <li>Implement rigorous data preprocessing and feature engineering pipelines.</li>
+                    <li>Ensure enterprise-grade security with SQLite user authentication and OTP recovery.</li>
+                </ul>
+                <div class="flow-container">
+                    <div class="flow-box">Objective 1: AI Model Integration</div>
+                    <div class="flow-arrow">&darr;</div>
+                    <div class="flow-box">Objective 2: Secure SQLite Auth</div>
+                    <div class="flow-arrow">&darr;</div>
+                    <div class="flow-box">Objective 3: Analytical Dashboard</div>
+                </div>
+            </div>
+            <div class="slide-footer">
+                <span>E-Commerce Sentiment Analyzer</span>
+                <span class="badge">Slide 4</span>
+            </div>
+        </div>
+
+        <!-- Slide 5: Scope & Applications -->
+        <div class="slide">
+            <div class="slide-header">
+                <div class="subtitle">Impact & Reach</div>
+                <h1>Scope & Real-World Applications</h1>
+            </div>
+            <div class="slide-content grid-2">
+                <ul>
+                    <li><strong>Business Intelligence:</strong> Enables e-commerce vendors and marketing teams to monitor customer sentiment trends.</li>
+                    <li><strong>Academic Value:</strong> Demonstrates the complete machine learning lifecycle.</li>
+                    <li><strong>Future Scalability:</strong> Ready for cloud deployment and live APIs.</li>
+                </ul>
+                <div class="chart-container">
+                    <div style="font-weight: 700; color: var(--primary); margin-bottom: 5px;">Application Domains</div>
+                    <div class="chart-bar-wrap"><div class="chart-label">Business</div><div class="chart-bar-bg"><div class="chart-bar-fill" style="width: 90%;">High Value</div></div></div>
+                    <div class="chart-bar-wrap"><div class="chart-label">Academic</div><div class="chart-bar-bg"><div class="chart-bar-fill" style="width: 85%;">Complete</div></div></div>
+                    <div class="chart-bar-wrap"><div class="chart-label">Scalability</div><div class="chart-bar-bg"><div class="chart-bar-fill" style="width: 95%;">Cloud Ready</div></div></div>
+                </div>
+            </div>
+            <div class="slide-footer">
+                <span>E-Commerce Sentiment Analyzer</span>
+                <span class="badge">Slide 5</span>
+            </div>
+        </div>
+
+        <!-- Slide 6: Literature Review & Limitations -->
+        <div class="slide">
+            <div class="slide-header">
+                <div class="subtitle">Chapter 2: Literature Review</div>
+                <h1>Existing Systems & Limitations</h1>
+            </div>
+            <div class="slide-content grid-2">
+                <ul>
+                    <li><strong>Existing Systems:</strong> Traditional platforms rely heavily on manual review reading or simple keyword matching.</li>
+                    <li><strong>Key Limitations:</strong> Unable to process high volumes efficiently, struggle with sarcasm, and lack integrated dashboards.</li>
+                    <li><strong>Proposed Advantage:</strong> Combines machine learning accuracy, database authentication, and reporting.</li>
+                </ul>
+                <div class="flow-container">
+                    <div class="flow-box">Legacy Keyword Matching</div>
+                    <div class="flow-arrow">&darr;</div>
+                    <div class="flow-box">Context Deficiencies & Sarcasm Failure</div>
+                    <div class="flow-arrow">&darr;</div>
+                    <div class="flow-box">Proposed Random Forest ML Solution</div>
+                </div>
+            </div>
+            <div class="slide-footer">
+                <span>E-Commerce Sentiment Analyzer</span>
+                <span class="badge">Slide 6</span>
+            </div>
+        </div>
+
+        <!-- Slide 7: Feasibility Study -->
+        <div class="slide">
+            <div class="slide-header">
+                <div class="subtitle">System Viability</div>
+                <h1>Feasibility Analysis Matrix</h1>
+            </div>
+            <div class="slide-content grid-2">
+                <ul>
+                    <li><strong>Technical Feasibility:</strong> Built using robust open-source tools (Python, Scikit-learn, Tkinter, SQLite) requiring standard hardware.</li>
+                    <li><strong>Operational Feasibility:</strong> Features an intuitive graphical interface designed for both technical and non-technical users.</li>
+                    <li><strong>Economic Feasibility:</strong> Zero expensive software licenses required, maximizing cost-effectiveness.</li>
+                </ul>
+                <div class="chart-container">
+                    <div style="font-weight: 700; color: var(--primary); margin-bottom: 5px;">Feasibility Assessment</div>
+                    <div class="chart-bar-wrap"><div class="chart-label">Technical</div><div class="chart-bar-bg"><div class="chart-bar-fill" style="width: 100%;">100% Ready</div></div></div>
+                    <div class="chart-bar-wrap"><div class="chart-label">Operational</div><div class="chart-bar-bg"><div class="chart-bar-fill" style="width: 100%;">Intuitive GUI</div></div></div>
+                    <div class="chart-bar-wrap"><div class="chart-label">Economic</div><div class="chart-bar-bg"><div class="chart-bar-fill" style="width: 100%;">Open Source</div></div></div>
+                </div>
+            </div>
+            <div class="slide-footer">
+                <span>E-Commerce Sentiment Analyzer</span>
+                <span class="badge">Slide 7</span>
+            </div>
+        </div>
+
+        <!-- Slide 8: System Architecture & Flowchart -->
+        <div class="slide">
+            <div class="slide-header">
+                <div class="subtitle">Chapter 3: System Design</div>
+                <h1>System Architecture & Hierarchical Flow</h1>
+            </div>
+            <div class="slide-content grid-2">
+                <div class="flow-container">
+                    <div class="flow-box">1. Customer Review Dataset</div>
+                    <div class="flow-arrow">&darr;</div>
+                    <div class="flow-box">2. Preprocessing & TF-IDF Vectorization</div>
+                    <div class="flow-arrow">&darr;</div>
+                    <div class="flow-box">3. Random Forest Model Training (.pkl)</div>
+                    <div class="flow-arrow">&darr;</div>
+                    <div class="flow-box">4. Tkinter GUI & SQLite Integration</div>
+                </div>
+                <div class="screenshot-container">
+                    <img src="Pictures/MainScreenPic.png" alt="System Architecture">
+                    <div class="caption">Figure: Pipeline Architecture Flowchart</div>
+                </div>
+            </div>
+            <div class="slide-footer">
+                <span>E-Commerce Sentiment Analyzer</span>
+                <span class="badge">Slide 8</span>
+            </div>
+        </div>
+
+        <!-- Slide 9: Dataset Description -->
+        <div class="slide">
+            <div class="slide-header">
+                <div class="subtitle">Data Engineering</div>
+                <h1>Dataset Description & Overfitting Control</h1>
+            </div>
+            <div class="slide-content grid-2">
+                <ul>
+                    <li><strong>Base Data Source:</strong> 30,000 structured e-commerce customer review records sourced from Kaggle.</li>
+                    <li><strong>Mitigating Overfitting:</strong> Addressed initial model overfitting constraints by expanding and refining data records using ChatGPT assistance.</li>
+                    <li><strong>Key Attributes:</strong> Demographics, Transaction attributes, and Textual Feedback.</li>
+                </ul>
+                <div class="chart-container">
+                    <div style="font-weight: 700; color: var(--primary); margin-bottom: 5px;">Dataset Breakdown</div>
+                    <div class="chart-bar-wrap"><div class="chart-label">Total Records</div><div class="chart-bar-bg"><div class="chart-bar-fill" style="width: 100%;">30,000 Rows</div></div></div>
+                    <div class="chart-bar-wrap"><div class="chart-label">Train Split</div><div class="chart-bar-bg"><div class="chart-bar-fill" style="width: 75%;">75% (22,500)</div></div></div>
+                    <div class="chart-bar-wrap"><div class="chart-label">Test Split</div><div class="chart-bar-bg"><div class="chart-bar-fill" style="width: 25%;">25% (7,500)</div></div></div>
+                </div>
+            </div>
+            <div class="slide-footer">
+                <span>E-Commerce Sentiment Analyzer</span>
+                <span class="badge">Slide 9</span>
+            </div>
+        </div>
+
+        <!-- Slide 10: Technology Stack -->
+        <div class="slide">
+            <div class="slide-header">
+                <div class="subtitle">Technology Stack</div>
+                <h1>Tools & Technologies Matrix</h1>
+            </div>
+            <div class="slide-content grid-2">
+                <ul>
+                    <li><strong>Core Language:</strong> Python 3.x (Development & Scripting)</li>
+                    <li><strong>GUI Framework:</strong> Tkinter (Interactive desktop interface)</li>
+                    <li><strong>Machine Learning:</strong> Scikit-learn (Random Forest Classifier, TF-IDF Vectorizer)</li>
+                    <li><strong>Data & Storage:</strong> Pandas, NumPy, SQLite, Joblib</li>
+                </ul>
+                <div class="chart-container">
+                    <div style="font-weight: 700; color: var(--primary); margin-bottom: 5px;">Tech Ecosystem</div>
+                    <div class="chart-bar-wrap"><div class="chart-label">Python / UI</div><div class="chart-bar-bg"><div class="chart-bar-fill" style="width: 100%;">Core Engine</div></div></div>
+                    <div class="chart-bar-wrap"><div class="chart-label">Scikit-Learn</div><div class="chart-bar-bg"><div class="chart-bar-fill" style="width: 100%;">ML Pipeline</div></div></div>
+                    <div class="chart-bar-wrap"><div class="chart-label">SQLite</div><div class="chart-bar-bg"><div class="chart-bar-fill" style="width: 100%;">Secure DB</div></div></div>
+                </div>
+            </div>
+            <div class="slide-footer">
+                <span>E-Commerce Sentiment Analyzer</span>
+                <span class="badge">Slide 10</span>
+            </div>
+        </div>
+
+        <!-- Slide 11: Methodology & Pipeline -->
+        <div class="slide">
+            <div class="slide-header">
+                <div class="subtitle">Chapter 4: Methodology</div>
+                <h1>Preprocessing & Feature Engineering Pipeline</h1>
+            </div>
+            <div class="slide-content grid-2">
+                <ul>
+                    <li><strong>Data Cleaning:</strong> Comprehensive handling of missing values, duplicates, and data anomalies.</li>
+                    <li><strong>Encoding Strategies:</strong> One-Hot Encoding applied to categorical parameters; TF-IDF Vectorization applied to review text.</li>
+                    <li><strong>Train-Test Split:</strong> Stratified split to maintain class balance.</li>
+                </ul>
+                <div class="flow-container">
+                    <div class="flow-box">Data Cleaning & Imputation</div>
+                    <div class="flow-arrow">&darr;</div>
+                    <div class="flow-box">One-Hot & TF-IDF Encoding</div>
+                    <div class="flow-arrow">&darr;</div>
+                    <div class="flow-box">Stratified Train-Test Split</div>
+                </div>
+            </div>
+            <div class="slide-footer">
+                <span>E-Commerce Sentiment Analyzer</span>
+                <span class="badge">Slide 11</span>
+            </div>
+        </div>
+
+        <!-- Slide 12: Model Selection -->
+        <div class="slide">
+            <div class="slide-header">
+                <div class="subtitle">Machine Learning Model</div>
+                <h1>Random Forest Classifier Mechanics</h1>
+            </div>
+            <div class="slide-content grid-2">
+                <ul>
+                    <li><strong>Algorithm Selection:</strong> Supervised Multi-Class Random Forest Ensemble.</li>
+                    <li><strong>Ensemble Advantage:</strong> Constructs multiple decision trees using subset bagging; final prediction is determined via majority voting.</li>
+                    <li><strong>Model Serialization:</strong> Compiled and serialized into sentiment_model.pkl via Joblib.</li>
+                </ul>
+                <div class="chart-container">
+                    <div style="font-weight: 700; color: var(--primary); margin-bottom: 5px;">Model Hyperparameters</div>
+                    <div class="chart-bar-wrap"><div class="chart-label">Estimators</div><div class="chart-bar-bg"><div class="chart-bar-fill" style="width: 100%;">200 Trees</div></div></div>
+                    <div class="chart-bar-wrap"><div class="chart-label">Max Depth</div><div class="chart-bar-bg"><div class="chart-bar-fill" style="width: 90%;">Depth 20</div></div></div>
+                    <div class="chart-bar-wrap"><div class="chart-label">Random State</div><div class="chart-bar-bg"><div class="chart-bar-fill" style="width: 42%;">Seed 42</div></div></div>
+                </div>
+            </div>
+            <div class="slide-footer">
+                <span>E-Commerce Sentiment Analyzer</span>
+                <span class="badge">Slide 12</span>
+            </div>
+        </div>
+
+        <!-- Slide 13: Home Screen Preview -->
+        <div class="slide">
+            <div class="slide-header">
+                <div class="subtitle">Chapter 5: Implementation</div>
+                <h1>Screen 1: Home Screen Entry Portal</h1>
+            </div>
+            <div class="slide-content grid-2">
+                <ul>
+                    <li>Acts as the primary graphical entry point for users.</li>
+                    <li>Features direct navigation buttons linking to the Login portal and the About Us application guide.</li>
+                </ul>
+                <div class="screenshot-container">
+                    <img src="Pictures/HomeScreenPic.png" alt="Home Screen">
+                    <div class="caption">Figure: Home Screen Interface</div>
+                </div>
+            </div>
+            <div class="slide-footer">
+                <span>E-Commerce Sentiment Analyzer</span>
+                <span class="badge">Slide 13</span>
+            </div>
+        </div>
+
+        <!-- Slide 14: Auth Screens Preview -->
+        <div class="slide">
+            <div class="slide-header">
+                <div class="subtitle">User Security</div>
+                <h1>Screens 2 & 3: Login & Signup Authentication</h1>
+            </div>
+            <div class="slide-content grid-2">
+                <ul>
+                    <li><strong>Secure Access:</strong> Validates user accounts stored directly inside the SQLite database (test1).</li>
+                    <li><strong>Input Validations:</strong> Enforces strict email structures, character limits, and password matching rules.</li>
+                </ul>
+                <div class="screenshot-container">
+                    <img src="Pictures/LoginScreenPic.png" alt="Login Screen">
+                    <div class="caption">Figure: Secure Login & Signup Modules</div>
+                </div>
+            </div>
+            <div class="slide-footer">
+                <span>E-Commerce Sentiment Analyzer</span>
+                <span class="badge">Slide 14</span>
+            </div>
+        </div>
+
+        <!-- Slide 15: OTP Feature Preview -->
+        <div class="slide">
+            <div class="slide-header">
+                <div class="subtitle">Advanced Feature</div>
+                <h1>Screen 4: Password Recovery via SMTP OTP</h1>
+            </div>
+            <div class="slide-content grid-2">
+                <ul>
+                    <li><strong>Self-Service Recovery:</strong> Allows users to reset forgotten credentials seamlessly.</li>
+                    <li><strong>Automated Email Dispatch:</strong> Utilizes Python's smtplib to transmit secure 6-digit verification codes directly to the registered email.</li>
+                </ul>
+                <div class="screenshot-container">
+                    <img src="Pictures/ForgetPassScreenPic.png" alt="Forgot Password Screen">
+                    <div class="caption">Figure: Forgot Password & OTP Workflow</div>
+                </div>
+            </div>
+            <div class="slide-footer">
+                <span>E-Commerce Sentiment Analyzer</span>
+                <span class="badge">Slide 15</span>
+            </div>
+        </div>
+
+        <!-- Slide 16: Prediction Screen Preview -->
+        <div class="slide">
+            <div class="slide-header">
+                <div class="subtitle">Core Prediction Engine</div>
+                <h1>Screen 5: Sentiment Analysis Interface</h1>
+            </div>
+            <div class="slide-content grid-2">
+                <ul>
+                    <li>Provides input fields for customer parameters and feedback text.</li>
+                    <li>Executes real-time inference using the loaded hybrid model to output prediction tags and confidence scores.</li>
+                </ul>
+                <div class="screenshot-container">
+                    <img src="Pictures/MainScreenPic.png" alt="Main Screen">
+                    <div class="caption">Figure: Real-Time Sentiment Prediction Panel</div>
+                </div>
+            </div>
+            <div class="slide-footer">
+                <span>E-Commerce Sentiment Analyzer</span>
+                <span class="badge">Slide 16</span>
+            </div>
+        </div>
+
+        <!-- Slide 17: Dashboard Screen Preview -->
+        <div class="slide">
+            <div class="slide-header">
+                <div class="subtitle">Visual Analytics</div>
+                <h1>Screen 6: Analytical Dashboard Interface</h1>
+            </div>
+            <div class="slide-content grid-2">
+                <ul>
+                    <li>Presents overall review counts, satisfaction scores, and confusion matrix models.</li>
+                    <li>Translates model outcomes into high-level business metrics visually.</li>
+                </ul>
+                <div class="screenshot-container">
+                    <img src="Pictures/DashboardScreenPic.png" alt="Dashboard Screen">
+                    <div class="caption">Figure: Model Performance Dashboard</div>
+                </div>
+            </div>
+            <div class="slide-footer">
+                <span>E-Commerce Sentiment Analyzer</span>
+                <span class="badge">Slide 17</span>
+            </div>
+        </div>
+
+        <!-- Slide 18: Results & Metrics with Graph -->
+        <div class="slide">
+            <div class="slide-header">
+                <div class="subtitle">Chapter 6: Results & Discussion</div>
+                <h1>Model Performance Evaluation Metrics</h1>
+            </div>
+            <div class="slide-content grid-2">
+                <ul>
+                    <li><strong>High Accuracy:</strong> Achieved an impressive <strong>91.48%</strong> overall accuracy score on testing data.</li>
+                    <li><strong>Balanced Metrics:</strong> High Precision (91.40%), Recall (91.48%), and F1-Scores (91.38%) across classes.</li>
+                </ul>
+                <div class="chart-container">
+                    <div class="chart-bar-wrap">
+                        <div class="chart-label">Accuracy</div>
+                        <div class="chart-bar-bg"><div class="chart-bar-fill" style="width: 91.48%;">91.48%</div></div>
+                    </div>
+                    <div class="chart-bar-wrap">
+                        <div class="chart-label">Precision</div>
+                        <div class="chart-bar-bg"><div class="chart-bar-fill" style="width: 91.40%;">91.40%</div></div>
+                    </div>
+                    <div class="chart-bar-wrap">
+                        <div class="chart-label">Recall</div>
+                        <div class="chart-bar-bg"><div class="chart-bar-fill" style="width: 91.48%;">91.48%</div></div>
+                    </div>
+                    <div class="chart-bar-wrap">
+                        <div class="chart-label">F1 Score</div>
+                        <div class="chart-bar-bg"><div class="chart-bar-fill" style="width: 91.38%;">91.38%</div></div>
+                    </div>
+                </div>
+            </div>
+            <div class="slide-footer">
+                <span>E-Commerce Sentiment Analyzer</span>
+                <span class="badge">Slide 18</span>
+            </div>
+        </div>
+
+        <!-- Slide 19: Conclusion -->
+        <div class="slide">
+            <div class="slide-header">
+                <div class="subtitle">Chapter 7: Conclusion</div>
+                <h1>Summary of Achievements</h1>
+            </div>
+            <div class="slide-content grid-2">
+                <ul>
+                    <li>Successfully designed, developed, and deployed an end-to-end e-commerce review sentiment analysis platform.</li>
+                    <li>Automated manual feedback evaluation, removing human bottlenecks and reducing analysis time.</li>
+                    <li>Successfully bridged machine learning predictive capability with a secure desktop software environment.</li>
+                </ul>
+                <div class="flow-container">
+                    <div class="flow-box">Data Collection & Training</div>
+                    <div class="flow-arrow">&darr;</div>
+                    <div class="flow-box">Tkinter Software Deployment</div>
+                    <div class="flow-arrow">&darr;</div>
+                    <div class="flow-box">Enterprise Decision Support</div>
+                </div>
+            </div>
+            <div class="slide-footer">
+                <span>E-Commerce Sentiment Analyzer</span>
+                <span class="badge">Slide 19</span>
+            </div>
+        </div>
+
+        <!-- Slide 20: Future Scope & Remarks -->
+        <div class="slide title-slide" style="text-align: center; justify-content: center;">
+            <div class="subtitle" style="color: var(--accent);">Future Roadmap</div>
+            <h1 style="color: white; margin-bottom: 25px; font-size: 38px;">Future Scope & Remarks</h1>
+            <p style="font-size: 19px; margin: 10px 0;">🌐 Web & Cloud-based deployment for remote multi-platform accessibility</p>
+            <p style="font-size: 19px; margin: 10px 0;">🤖 Integration of Advanced Transformers (e.g., BERT) for deeper contextual text processing</p>
+            <p style="font-size: 19px; margin: 10px 0;">⚡ Live e-commerce & social media API streaming integration</p>
+            <div class="slide-footer" style="border-top: 1px solid rgba(255,255,255,0.1); color: #94A3B8; width: 100%; position: absolute; bottom: 20px; left: 0; padding: 0 50px; box-sizing: border-box;">
+                <span>E-Commerce Sentiment Analyzer Project</span>
+                <span>Slide 20 / 21</span>
+            </div>
+        </div>
+
+        <!-- Slide 21: Thank You Slide -->
+        <div class="slide title-slide" style="text-align: center; justify-content: center;">
+            <div class="subtitle" style="color: var(--accent); font-size: 20px; letter-spacing: 2px;">End of Presentation</div>
+            <h1 style="color: white; font-size: 64px; margin-top: 20px; letter-spacing: 2px;">THANK YOU</h1>
+            <div class="slide-footer" style="border-top: 1px solid rgba(255,255,255,0.1); color: #94A3B8; width: 100%; position: absolute; bottom: 20px; left: 0; padding: 0 50px; box-sizing: border-box;">
+                <span>E-Commerce Sentiment Analyzer Project</span>
+                <span>Slide 21 / 21</span>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Floating Navigation Overlay -->
+    <div class="nav-controls">
+        <button class="nav-btn" onclick="prevSlide()">&#10094; Prev</button>
+        <button class="nav-btn" onclick="nextSlide()">Next &#10095;</button>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+
+        function showSlide(index) {
+            slides.forEach((slide, i) => {
+                slide.classList.remove('active');
+                if (i === index) {
+                    slide.classList.add('active');
+                }
+            });
+        }
+
+        function nextSlide() {
+            if (currentSlide < slides.length - 1) {
+                currentSlide++;
+                showSlide(currentSlide);
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 0) {
+                currentSlide--;
+                showSlide(currentSlide);
+            }
+        }
+
+        // Keyboard arrow key and space listener
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                e.preventDefault();
+                nextSlide();
+            } else if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                prevSlide();
+            }
+        });
+    </script>
+</body>
+</html>
